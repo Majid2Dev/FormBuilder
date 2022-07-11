@@ -1,0 +1,77 @@
+﻿@model FormBuilder.Models.Field
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Field</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DataType" class="control-label"></label>
+                <select asp-for="DataType" id="DataType" asp-items="@Html.GetEnumSelectList<DataType>()" class="form-control"></select>
+                <span asp-validation-for="DataType" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2 ">
+                <label asp-for="FormId" class="control-label"></label>
+                <select asp-for="FormId" class="form-control" asp-items="ViewBag.FormId"></select>
+            </div>
+            <div class="form-group " id="btnSubmit">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script>
+        $("#DataType").change(function() {
+            let dataTypeNumberValue = $("#DataType").val();
+            //5
+            //6
+            //7
+            //8
+            if (dataTypeNumberValue >= 5 && dataTypeNumberValue <= 8) {
+                alert(dataTypeNumberValue);
+                let appendData = `<select name="VocabularieId" class="form-select" aria-label="Default select example">
+                                  <option selected>انتخاب کنید</option>
+                                  </select>`;
+                $("#btnSubmit").parent().prepend(appendData);
+                $.ajax({
+                    url: "/GetAllVocabularie",
+                    type: "get",
+                    dateType: "json",
+                    data: { id: $(this).val() },
+                    success: function(data) {
+                        let selectVocabularied = $("select[name='VocabularieId']");
+                        let jsonArray = JSON.parse(data);
+                        for (var i = 0; i < jsonArray.length; i++) {
+                            selectVocabularied.append(
+                                $('<option/>').attr('value', jsonArray[i]["Id"]).text(jsonArray[i]["Name"])
+                            );
+                        }
+                    },
+                    error: function() { alert('Error'); }
+                });
+            }
+
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

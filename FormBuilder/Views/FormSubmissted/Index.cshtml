@@ -1,0 +1,49 @@
+﻿@model List<Field>
+@inject AppDbContext _Context
+@{
+    ViewData["Title"] = "Index";
+}
+<form asp-controller="FormSubmissted" asp-action="FromApply" enctype="multipart/form-data" id="dynamicForm" method="post" novalidate="novalidate">
+    @foreach (var Item in Model.OrderByDescending(x=>x.Id))
+    {
+        if (Item.DataType==DataType.Header)
+        {
+            <p>@Item.Name</p>
+        }
+        @if (Item.DataType == DataType.ComboBox)
+        {
+            var GettingTerms = _Context.Terms.Where(x => x.VocabularieId == Item.VocabularieId.Value);
+            var SeletctList = new SelectList(GettingTerms, "Id", "Value");
+          <label  class="form-label">@Item.Name</label>
+         
+            <select name="Majid_@(Item.Id)" id="Majid_@(Item.Id)" class="form-select" aria-label="Default select example" asp-items="SeletctList" >
+                <option selected>انتخاب کنید</option>
+              
+            </select>
+        }
+        @if (Item.DataType == DataType.CheckboxList)
+        {
+            var GettingTerms = _Context.Terms.Where(x => x.VocabularieId == Item.VocabularieId.Value);
+        
+            <div>
+                <b>@Item.Name</b>
+                @foreach (var Term in GettingTerms)
+                {
+                    <label><input type='checkbox'value="@Term.Id" name="Majid_@(Item.Id)" id="Majid_@(Item.Id)"/> @Term.Value </label>
+
+                }
+             
+            </div>
+        }
+        if (Item.DataType==DataType.TextBox)
+        {
+            <div class="mb-3">
+                <label for="text" class="form-label">@Item.Name</label>
+                <input type="text" class="form-control" name="Majid_@(Item.Id)" id="Majid_@(Item.Id)" >
+            </div>
+        }
+    }
+    <input type="hidden" name="Id" value="@Model.First().FormId"/>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
